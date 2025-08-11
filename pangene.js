@@ -1,6 +1,6 @@
 #!/usr/bin/env k8
 
-const pg_version = "1.1-r231";
+const pg_version = "1.1-r249-dirty";
 
 /**************
  * From k8.js *
@@ -1201,8 +1201,15 @@ function pg_cmd_gfa2matrix(args) {
 		let process_b = function(b) {
 			let sel = -1;
 			if (b.length == 0) return;
-			for (let i = 0; i < b.length; ++i)
-				if (b[i][1]) sel = i;
+			for (let i = 0; i < b.length; ++i) {
+				const gene = b[i][0].split(":")[0];
+				if (b[i][1]) {
+					if (g.segname[gene] != null) // only if the selected gene present in the graph
+						sel = i;
+				} else if (g.segname[gene] != null) {
+					if (sel < 0) sel = i;
+				}
+			}
 			if (sel >= 0) {
 				for (let i = 0; i < b.length; ++i) {
 					if (i == sel) continue;
